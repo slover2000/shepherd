@@ -1,0 +1,8 @@
+LogFile = "access.log"
+
+[NginxConf]
+Addr = "http://127.0.0.1:18882"
+KeepAliveConnNum = 30
+UpstreamMaxFailed = 2
+UpstreamFailedTimeout = "5s"
+UpstreamFilePath = "./dyups.upstream.com.conf"
