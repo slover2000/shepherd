@@ -254,7 +254,7 @@ func addNginxUpstreamServer(serviceName, upstreamServers string) {
 		log.WithFields(log.Fields{
 			"service": serviceName,
 			"servers": upstreamServers,
-		}).Error("Add upstream servers to nginx success.")
+		}).Info("Add upstream servers to nginx success.")
 	}
 }
 
@@ -276,7 +276,7 @@ func delNginxUpstream(serviceName string) {
 	if resp.StatusCode == 200 {
 		log.WithFields(log.Fields{
 			"service": serviceName,
-		}).Error("Delete service from nginx success.")
+		}).Info("Delete service from nginx success.")
 	}
 }
 
