@@ -170,6 +170,30 @@ func convertToStringSlice(set mapset.Set) []string {
 	return slices
 }
 
+func isUpstreamChanged(old, current ConsulServices) bool {
+	oldSet := mapset.NewSet()
+	for k := range old {
+		oldSet.Add(k)
+	}
+
+	currentSet := mapset.NewSet()
+	for k := range current {
+		currentSet.Add(k)
+	}
+
+	intersect := currentSet.Intersect(oldSet)
+	for _, k := range intersect.ToSlice() {
+		key := k.(string)
+		oldValue := old[key]
+		curValue := current[key]
+		if !reflect.DeepEqual(oldValue, curValue) {
+			return true
+		}
+	}
+
+	return false
+}
+
 func getChanges(old, current ConsulServices) *ChangeInfo {
 	oldSet := mapset.NewSet()
 	for k := range old {
@@ -351,7 +375,8 @@ func main() {
 				continue
 			}
 
-			if newIndex != lastIndex {
+			upstreamChanged := isUpstreamChanged(oldServices, services)
+			if newIndex != lastIndex || upstreamChanged {
 				log.WithFields(log.Fields{
 					"old_index": lastIndex,
 					"new_index": newIndex,
@@ -359,6 +384,9 @@ func main() {
 				lastIndex = newIndex
 	
 				updateNginxUpstream(oldServices, services)
+				oldServices = services
+			} else {
+				log.Info("Nothing changes")
 			}
 		}
 
